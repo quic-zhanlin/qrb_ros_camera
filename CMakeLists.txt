@@ -25,8 +25,6 @@ include_directories (${SYSROOT_INCDIR}/qmmf-sdk/include PRIVATE)
 include_directories (${SYSROOT_INCDIR}/qmmf-sdk PRIVATE)
 include_directories (${SYSROOT_INCDIR}/opencv4)
 include_directories (${SYSROOT_INCDIR}/camx-api/camx/service)
-include_directories (${SYSROOT_INCDIR}/glib-2.0)
-include_directories (${SYSROOT_LIBDIR}/glib-2.0/include)
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
@@ -45,7 +43,6 @@ rclcpp_components_register_nodes(qrb_camera "qrb_ros::camera::CameraNode")
 target_link_libraries( qrb_camera
   camera_metadata
   qmmf_recorder_client
-  glib-2.0
   qmmf_utils
   yaml-cpp
 )

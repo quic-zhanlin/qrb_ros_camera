@@ -1,98 +1,140 @@
-# qrb_ros_camera
-
-qrb_ros_camera is a package to publish the camera data from camera sensor.
+# QRB ROS CAMERA
 
 ## Overview
 
-Qualcomm Camera-Server provides camera data that obtained from the camera sensor. qrb_ros_camera use this camera-server to get the latest camera data. With camera ros2 node, data can achieve zero copy performance when coming out of the camera-server. This will greatly reduce the latency between ROS nodes.
+`qrb_ros_camera` is a ROS package to publish the camera data from camera sensor.
 
-This package is accelerated by [QRB ROS Transport](https://github.com/quic-qrb-ros/qrb_ros_transport), it leverages type adaption and intra process communication to optimize message formats and
-dramatically accelerate communication between participating nodes.
+`qrb_ros_camera` holds significant importance as it serves as a critical component for numerous other ROS nodes that 
+rely on image data for analysis and processing. By providing images in the NV12 format, it enables seamless integration 
+with a wide range of ROS nodes, empowering advanced image-based analysis and functionalities within the ROS ecosystem.
 
-> **Note:** To change the frame size and cameraid of the camera data, we need to change parameters in camera ros node launch file.
->
-## Compile
+`qrb_ros_camera` features zero-copy transport for reduced latency, facilitating swift image transmission. It also 
+supports concurrent output from multiple cameras, enhancing system performance and scalability in real-time ROS 
+applications.
 
-Currently, we only support compiling using QCLINUX
+## Getting Started
 
-1. Setup environments follow this document 's `6.1 Set up the runtime environment for samples` part in: <document link>
+<details><summary>Cross Compile with QCLINUX SDK</summary>
 
-2. Clone this repository under `${QIRP_SDK_PATH}/ws`
-     ```bash
-     git clone https://github.com/quic-qrb-ros/lib_mem_dmabuf.git
-     git clone https://github.com/quic-qrb-ros/qrb_ros_transport.git
-     git clone https://github.qualcomm.com/QUIC-QRB-ROS/qrb_ros_camera.git
-     ```
-3. Build this project
-     ```bash
-     export AMENT_PREFIX_PATH="${OECORE_TARGET_SYSROOT}/usr;${OECORE_NATIVE_SYSROOT}/usr"
-     export PYTHONPATH=${PYTHONPATH}:${OECORE_TARGET_SYSROOT}/usr/lib/python3.10/site-packages
+#### Cross Compile with QCLINUX SDK
 
-    colcon build --merge-install --cmake-args \
-      -DPython3_ROOT_DIR=${OECORE_TARGET_SYSROOT}/usr \
-      -DPython3_NumPy_INCLUDE_DIR=${OECORE_TARGET_SYSROOT}/usr/lib/python3.10/site-packages/numpy/core/include \
-      -DSYSROOT_LIBDIR=${OECORE_TARGET_SYSROOT}/usr/lib \
-      -DSYSROOT_INCDIR=${OECORE_TARGET_SYSROOT}/usr/include \
-      -DPYTHON_SOABI=cpython-310-aarch64-linux-gnu -DCMAKE_STAGING_PREFIX=$(pwd)/install \
-      -DCMAKE_PREFIX_PATH=$(pwd)/install/share \
-      -DBUILD_TESTING=OFF
-     ```
-4. Push to the device & Install
-     ```bash
-     cd ${QIRP_SDK_PATH}/ws/install
-     tar czvf qrb_ros_camera.tar.gz include lib share
-     scp qrb_ros_camera.tar.gz root@[ip-addr]:/opt/
-     ssh ssh root@[ip-addr]
-     (ssh) tar -zxf /opt/qrb_ros_camera.tar.gz -C /opt/qcom/qirp-sdk/usr/
-     ```
+Setup QCLINUX SDK environments:
+- Reference [QRB ROS Documents: Getting Started](https://quic-qrb-ros.github.io/getting_started/environment_setup.html)
 
-## Execute
+Create workspace in QCLINUX SDK environment and clone source code
 
-This package supports direct execution and dynamic addition to the component container
-
-a.Direct Execution
-
-1. Source this file to set up the environment on your device:
-    ```bash
-    ssh root@[ip-addr]
-    (ssh) export HOME=/opt
-    (ssh) source /opt/qcom/qirp-sdk/qirp-setup.sh
-    (ssh) export ROS_DOMAIN_ID=xx
-    (ssh) source /usr/bin/ros_setup.bash
-    ```
-
-2. Use this command to run this package
-    ```bash
-    (ssh) ros2 launch qrb_ros_camera qrb_ros_camera_launch.py
-    ```
-
-b. Add it to the component container
-```python
-ComposableNode(
-    package='qrb_ros_camera',
-    plugin='qrb_ros::camera::CameraNode',
-    name='camera_node'
-)
+```bash
+mkdir -p <qirp_decompressed_workspace>/qirp-sdk/ros_ws
+cd <qirp_decompressed_workspace>/qirp-sdk/ros_ws
+git clone https://github.com/quic-qrb-ros/qrb_ros_imu.git
+git clone https://github.com/quic-qrb-ros/lib_mem_dmabuf.git
+git clone https://github.com/quic-qrb-ros/qrb_ros_transport.git
+git clone https://github.com/quic-qrb-ros/qrb_ros_camera.git
 ```
 
-## Acceleration
+Build source code with QCLINUX SDK
 
-This package is powered by [QRB ROS Transport](https://github.com/quic-qrb-ros/qrb_ros_transport) to optimize message formats and accelerate communication between participating nodes.
+```bash
+export AMENT_PREFIX_PATH="${OECORE_TARGET_SYSROOT}/usr;${OECORE_NATIVE_SYSROOT}/usr"
+export PYTHONPATH=${PYTHONPATH}:${OECORE_TARGET_SYSROOT}/usr/lib/python3.10/site-packages
 
-## Packages
+colcon build --merge-install --cmake-args \
+    -DPython3_ROOT_DIR=${OECORE_TARGET_SYSROOT}/usr \
+    -DPython3_NumPy_INCLUDE_DIR=${OECORE_TARGET_SYSROOT}/usr/lib/python3.10/site-packages/numpy/core/include \
+    -DSYSROOT_LIBDIR=${OECORE_TARGET_SYSROOT}/usr/lib \
+    -DSYSROOT_INCDIR=${OECORE_TARGET_SYSROOT}/usr/include \
+    -DPYTHON_SOABI=cpython-310-aarch64-linux-gnu -DCMAKE_STAGING_PREFIX=$(pwd)/install \
+    -DCMAKE_PREFIX_PATH=$(pwd)/install/share \
+    -DBUILD_TESTING=OFF
+```
 
-Will update in the future.
+Install ROS package to device
 
-## Resources
+```bash
+cd <qirp_decompressed_workspace>/qirp-sdk/ros_ws/install
+tar czvf qrb_ros_camera.tar.gz include lib share
+scp qrb_ros_camera.tar.gz root@[ip-addr]:/opt/
+ssh ssh root@[ip-addr]
+(ssh) tar -zxf /opt/qrb_ros_camera.tar.gz -C /opt/qcom/qirp-sdk/usr/
+```
 
-- [ROS2 Type Adaption](https://ros.org/reps/rep-2007.html)
+Login to device and run
 
-## Contributions
+```bash
+ssh root@[ip-addr]
+(ssh) export HOME=/opt
+(ssh) source /usr/bin/ros_setup.bash
+(ssh) source /opt/qcom/qirp-sdk/qirp-setup.sh
+(ssh) ros2 launch qrb_ros_camera qrb_ros_camera_launch.py
+```
 
-Thanks for your interest in contributing to qrb_ros_camera! Please read our [Contributions Page](CONTRIBUTING.md) for more information on contributing features or bug fixes. We look forward to your participation!
+</details>
+
+<details open><summary>Native Build on Ubuntu</summary>
+
+#### Native Build on Ubuntu
+
+Prerequisites
+
+- ROS 2: [Install ROS2 on Ubuntu](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
+- camera-server environment install:
+```bash
+sudo apt install libimage-transport-dev
+sudo add-apt-repository ppa:carmel-team/jammy-release --login
+sudo apt upgrade
+sudo apt install weston-qcom gstreamer1.0-plugins-qcom gstreamer1.0-tools camxapi-kt libqmmf-dev syslog-plumber-dev
+sudo cp /usr/include/log/log.h /usr/include/log.h
+sudo reboot
+```
+Create workspace and clone source code from GitHub:
+
+```bash
+mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
+git clone https://github.com/quic-qrb-ros/qrb_ros_imu.git
+git clone https://github.com/quic-qrb-ros/lib_mem_dmabuf.git
+git clone https://github.com/quic-qrb-ros/qrb_ros_transport.git
+git clone https://github.com/quic-qrb-ros/qrb_ros_camera.git
+```
+Build source code
+
+```bash
+cd ~/ros2_ws
+source /opt/ros/${ROS_DISTRO}/setup.bash
+colcon build
+```
+
+Run qrb_ros_camera
+
+```bash
+cd ~/ros2_ws
+source install/setup.bash
+ros2 launch qrb_ros_camera qrb_ros_camera_launch.py
+```
+
+</details>
+
+## Supported Platforms
+
+This package is designed and tested to be compatible with ROS 2 Humble running on Qualcomm RB3 gen2.
+
+| Hardware                                                     | Software          |
+| ------------------------------------------------------------ | ----------------- |
+| [Qualcomm RB3 gen2](https://www.qualcomm.com/developer/hardware/rb3-gen-2-development-kit) | `LE.QCROBOTICS.1.0`, `Canonical Ubuntu Image for RB3 gen2` |
+
+## Contributing
+
+We would love to have you as a part of the QRB ROS community. Whether you are helping us fix bugs, proposing new features, improving our documentation, or spreading the word, please refer to our [contribution guidelines](./CONTRIBUTING.md) and [code of conduct](./CODE_OF_CONDUCT.md).
+
+- Bug report: If you see an error message or encounter failures, please create a [bug report](../../issues)
+- Feature Request: If you have an idea or if there is a capability that is missing and would make development easier and more robust, please submit a [feature request](../../issues)
+
+## Authors
+
+* **Tian Ding** - *Initial work* - [dingtian777](https://github.com/dingtian777)
+
+See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
-qrb_ros_camera is licensed under the BSD-3-clause "New" or "Revised" License. 
+Project is licensed under the [BSD-3-clause License](https://spdx.org/licenses/BSD-3-Clause.html). See [LICENSE](./LICENSE) for the full license text.
 
-Check out the [LICENSE](LICENSE) for more details.
