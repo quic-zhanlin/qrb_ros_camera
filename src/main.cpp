@@ -1,7 +1,6 @@
 // Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 #include "qrb_ros_camera/camera_ros2_node.hpp"
-#include "qrb_ros_camera/test_ros2_node.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 int32_t main(int32_t argc, char ** argv)
