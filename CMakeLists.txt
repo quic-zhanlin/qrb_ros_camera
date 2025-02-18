@@ -31,16 +31,26 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_executable(qrb_ros_camera src/main.cpp)
 
-ament_auto_add_library(qrb_camera SHARED
+ament_auto_add_library(camera_component SHARED
   src/camera_ros2_config.cpp
   src/camera_ros2_node.cpp
   src/qmmf_camera_parameters.cpp
   src/qmmf_camera.cpp
-  src/qmmf_ros2_pipeline.cpp)
+  src/qmmf_ros2_pipeline.cpp
+  )
 
-rclcpp_components_register_nodes(qrb_camera "qrb_ros::camera::CameraNode")
+  ament_auto_add_library(test_component SHARED
+  src/camera_ros2_config.cpp
+  src/test_ros2_node.cpp
+  src/test_ros2_out_node.cpp)
 
-target_link_libraries( qrb_camera
+rclcpp_components_register_nodes(camera_component "qrb_ros::camera::CameraNode")
+rclcpp_components_register_nodes(test_component "qrb_ros::camera::TestNode")
+rclcpp_components_register_nodes(test_component "qrb_ros::camera::TestOutNode")
+
+target_link_libraries(camera_component dl pthread camera_metadata)
+
+target_link_libraries( camera_component
   camera_metadata
   qmmf_recorder_client
   qmmf_utils
@@ -48,23 +58,8 @@ target_link_libraries( qrb_camera
 )
 
 target_link_libraries(qrb_ros_camera
-  qrb_camera
+  camera_component
+  test_component
 )
 
 ament_auto_package(INSTALL_TO_SHARE config launch)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
