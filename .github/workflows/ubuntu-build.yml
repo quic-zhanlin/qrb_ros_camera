@@ -11,6 +11,12 @@ env:
 jobs:
   ros-build:
     uses: qualcomm-qrb-ros/qrb_ros_gh_actions/.github/workflows/ubuntu-build.yml@main
-    # with:
+    with: 
+      env_setup_commands: |
+        mkdir -p /sys/devices/soc0
+        touch /sys/devices/soc0/machine
+        touch /sys/devices/soc0/soc_id
+        echo QCS9075 > /sys/devices/soc0/machine
+        echo 676 > /sys/devices/soc0/soc_id
     #   # QRB ROS dependency
     #   dependencies: "qualcomm-qrb-ros/qrb_ros_transport qualcomm-qrb-ros/lib_mem_dmabuf"
